@@ -1,0 +1,21 @@
+.glass {
+  /* Темно-серый (антрацит) с прозрачностью всего 15% */
+  /* Это даст благородную тень, но сохранит легкость */
+  background: rgba(197, 197, 197, 0.15) !important;
+
+  backdrop-filter: blur(20px); /* Немного увеличим размытие для мягкости */
+  -webkit-backdrop-filter: blur(20px);
+
+  /* Граница: белая, но почти прозрачная (создает эффект отблеска на ребре) */
+  border: 1px solid rgba(255, 255, 255, 0.08) !important;
+
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.15); /* Мягкая тень */
+  border-radius: var(--radius-lg);
+}
+
+/* hover elevation */
+.glass-hover:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 12px 40px rgba(0, 0, 0, 0.2);
+  transition: all 0.3s ease;
+}

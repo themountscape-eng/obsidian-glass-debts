@@ -1,0 +1,340 @@
+/* ==========================================================================
+   1. ОСНОВА И ПЕРЕМЕННЫЕ
+   ========================================================================== */
+:root {
+  --glass-bg: rgba(255, 255, 255, 0.06);
+  --glass-border: rgba(255, 255, 255, 0.1);
+  --accent-success: #00ff9d;
+  --accent-error: #ff4757;
+  --accent-warning: #fbbf24;
+  --accent-info: #00d4ff;
+  --main-padding: 24px;
+}
+
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  background: radial-gradient(circle at top right, #1a1c2c, #0d0e14);
+  color: #fff;
+  font-family:
+    "Inter",
+    -apple-system,
+    sans-serif;
+  height: 100vh;
+  width: 100vw;
+  overflow: hidden;
+}
+
+.glass {
+  background: var(--glass-bg);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1px solid var(--glass-border);
+  border-radius: 24px;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+}
+
+/* ==========================================================================
+   2. КОНТЕЙНЕР И ИСПРАВЛЕННЫЙ HEADER
+   ========================================================================== */
+.container {
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
+  padding: var(--main-padding) 30px;
+  gap: 20px;
+  box-sizing: border-box;
+}
+
+.app-header {
+  width: 100%;
+  flex-shrink: 0;
+  z-index: 10;
+}
+
+.header-content {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0 25px;
+  height: 70px; /* Фиксированная высота шапки */
+}
+
+.logo {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  font-weight: 800;
+  font-size: 20px;
+  color: #fff;
+}
+
+.user-profile {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  background: rgba(255, 255, 255, 0.05);
+  padding: 8px 16px;
+  border-radius: 14px;
+  font-size: 14px;
+  border: 1px solid var(--glass-border);
+}
+
+/* ==========================================================================
+   3. ГЛАВНАЯ СЕТКА (Layout)
+   ========================================================================== */
+.main-wrapper {
+  display: grid;
+  grid-template-columns: repeat(6, 1fr);
+  /* Теперь 3 ряда: 400px (верх), 150px (статы), остаток (активность) */
+  grid-template-rows: 400px 150px 1fr;
+  gap: 24px;
+  flex: 1;
+  min-height: 0;
+}
+
+#left-section {
+  grid-column: span 4;
+}
+#middle-section {
+  grid-column: span 2;
+}
+
+#stats-row {
+  grid-column: 1 / -1;
+  display: grid;
+  grid-template-columns: repeat(6, 1fr);
+  gap: 24px;
+  height: 150px;
+}
+
+#right-section {
+  grid-column: 1 / -1;
+  display: grid;
+  grid-template-columns: repeat(6, 1fr);
+  gap: 24px;
+  min-height: 0;
+}
+
+/* ==========================================================================
+   4. ВЕРХНИЕ БЛОКИ (400px)
+   ========================================================================== */
+.main-block,
+.chart-section {
+  height: 100%;
+  padding: 30px;
+  display: flex;
+  flex-direction: column;
+}
+
+.main-block {
+  justify-content: space-between;
+}
+
+.welcome-text {
+  font-size: 14px;
+  text-transform: uppercase;
+  color: rgba(255, 255, 255, 0.4);
+}
+.user-name {
+  font-size: 32px;
+  font-weight: 800;
+  margin-top: 5px;
+}
+.total-amount {
+  font-weight: 900;
+  line-height: 0.9;
+  letter-spacing: -2px;
+}
+
+.debt-trend {
+  display: inline-flex;
+  padding: 6px 12px;
+  border-radius: 10px;
+  font-size: 13px;
+  font-weight: 700;
+  width: fit-content;
+  margin: 10px 0;
+}
+.trend-up {
+  background: rgba(255, 71, 87, 0.15);
+  color: var(--accent-error);
+}
+.trend-down {
+  background: rgba(0, 255, 157, 0.15);
+  color: var(--accent-success);
+}
+.trend-neutral {
+  background: rgba(255, 255, 255, 0.1);
+  color: rgba(255, 255, 255, 0.5);
+}
+
+/* ==========================================================================
+   5. СТАТИСТИКА И КНОПКИ (150px)
+   ========================================================================== */
+.stat-card,
+.action-card {
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+}
+.stat-card {
+  padding: 20px;
+  justify-content: space-between;
+}
+.stat-card .value {
+  font-size: 26px;
+  font-weight: 800;
+}
+.stat-card-label {
+  font-size: 11px;
+  text-transform: uppercase;
+  opacity: 0.4;
+}
+
+.action-card {
+  cursor: pointer;
+  border: none;
+  background: none;
+  outline: none;
+}
+.btn-tile {
+  width: 100%;
+  height: 100%;
+  padding: 20px;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  align-items: flex-start;
+  transition: 0.3s;
+  border-radius: 24px;
+}
+.btn-success-tile {
+  color: var(--accent-success);
+  border: 1px solid rgba(0, 255, 157, 0.15);
+}
+.btn-outline-tile {
+  color: var(--accent-warning);
+  border: 1px solid rgba(251, 191, 36, 0.15);
+}
+.action-card:hover .btn-tile {
+  transform: translateY(-5px);
+  background: rgba(255, 255, 255, 0.08);
+}
+.action-title {
+  font-size: 16px;
+  font-weight: 700;
+  margin-top: auto;
+}
+
+/* ==========================================================================
+   6. НИЖНИЕ БЛОКИ (Scrollable)
+   ========================================================================== */
+.feed-section {
+  grid-column: span 4;
+  padding: 24px;
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+}
+.tips-section {
+  grid-column: span 2;
+  padding: 24px;
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+}
+
+h3 {
+  font-size: 16px;
+  margin-bottom: 15px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  opacity: 0.8;
+}
+
+#feedList,
+#tipsContainer {
+  flex: 1;
+  overflow-y: auto;
+  padding-right: 10px;
+}
+.feed-item {
+  display: flex;
+  align-items: center;
+  gap: 15px;
+  padding: 12px;
+  background: rgba(255, 255, 255, 0.03);
+  border-radius: 18px;
+  margin-bottom: 10px;
+}
+.tip-item {
+  background: rgba(0, 212, 255, 0.06);
+  padding: 16px;
+  border-radius: 18px;
+  font-size: 14px;
+  border-left: 4px solid var(--accent-info);
+  margin-bottom: 10px;
+}
+
+/* Кастомный скроллбар */
+#feedList::-webkit-scrollbar {
+  width: 4px;
+}
+#feedList::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 10px;
+}
+
+/* ==========================================================================
+   7. МОДАЛКИ
+   ========================================================================== */
+.modal {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.7);
+  backdrop-filter: blur(10px);
+  display: none;
+  align-items: center;
+  justify-content: center;
+  z-index: 9999;
+}
+.modal.active {
+  display: flex;
+}
+.modal-content {
+  width: 420px;
+  padding: 35px;
+  border-radius: 32px;
+}
+input,
+textarea {
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid var(--glass-border);
+  padding: 14px;
+  border-radius: 14px;
+  color: #fff;
+  width: 100%;
+  margin-bottom: 10px;
+  outline: none;
+}
+.btn {
+  flex: 1;
+  padding: 14px;
+  border-radius: 14px;
+  border: none;
+  font-weight: 700;
+  cursor: pointer;
+}
+.btn-success {
+  background: var(--accent-success);
+  color: #000;
+}

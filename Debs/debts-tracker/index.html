@@ -1,0 +1,51 @@
+<!doctype html>
+<html lang="ru">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Учет Долгов | Obsidian Glass</title>
+
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800;900&display=swap"
+      rel="stylesheet"
+    />
+
+    <link rel="stylesheet" href="css/base.css" />
+    <link rel="stylesheet" href="css/glass.css" />
+    <link rel="stylesheet" href="css/style.css" />
+    <link rel="stylesheet" href="css/modals.css" />
+    <link rel="stylesheet" href="css/responsive.css" />
+
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  </head>
+
+  <body>
+    <div class="animated-background">
+      <canvas id="background-canvas"></canvas>
+    </div>
+
+    <div class="container">
+      <header id="app-header"></header>
+
+      <div class="main-wrapper">
+        <div id="left-section"></div>
+        <div id="middle-section"></div>
+        <div id="stats-row"></div>
+        <div id="right-section"></div>
+      </div>
+    </div>
+
+    <div id="modal-root"></div>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <script src="js/storage.js"></script>
+    <script src="js/utils.js"></script>
+    <script src="js/icons.js"></script>
+    <script src="js/ui.js"></script>
+    <script src="js/debts.js"></script>
+    <script src="js/feed.js"></script>
+    <script src="js/chart.js"></script>
+    <script src="js/app.js"></script>
+    <script src="js/silk-background.js"></script>
+  </body>
+</html>

@@ -1,0 +1,121 @@
+/* ============================================================
+   RESPONSIVE
+============================================================ */
+
+/* ===== Tablet ===== */
+
+@media (max-width: 768px) {
+  body {
+    overflow-y: auto; /* Возвращаем скролл всей страницы для мобилок */
+    height: auto;
+  }
+
+  .container {
+    height: auto;
+    overflow: visible;
+  }
+
+  .main-wrapper {
+    grid-template-rows: repeat(4, auto); /* Сбрасываем высоты рядов */
+    gap: 16px;
+  }
+
+  .total-amount {
+    /* Фиксируем размер, чтобы цифра не вылезала за края */
+    font-size: 48px !important;
+    word-break: break-all;
+  }
+
+  /* Чтобы график не схлопывался в ноль */
+  .chart-section {
+    height: 350px;
+  }
+}
+
+@media (max-width: 1200px) {
+  .main-wrapper {
+    grid-template-columns: 3fr 2fr;
+  }
+
+  #stats-row {
+    grid-template-columns: repeat(3, 1fr);
+  }
+
+  #right-section {
+    grid-template-columns: 3fr 2fr;
+  }
+}
+
+/* ===== Small Tablet ===== */
+
+@media (max-width: 1024px) {
+  #stats-row {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+/* ===== Mobile ===== */
+
+@media (max-width: 768px) {
+  .main-wrapper {
+    grid-template-columns: 1fr;
+    grid-template-rows: auto auto auto 1fr;
+  }
+
+  #left-section {
+    grid-row: 1;
+    grid-column: 1;
+  }
+
+  #middle-section {
+    grid-row: 2;
+    grid-column: 1;
+  }
+
+  #stats-row {
+    grid-row: 3;
+    grid-template-columns: 1fr;
+  }
+
+  #right-section {
+    grid-row: 4;
+    grid-template-columns: 1fr;
+  }
+
+  .chart-section {
+    min-height: 260px;
+    max-height: 320px;
+  }
+
+  .main-block {
+    padding: 20px;
+  }
+
+  .total-amount {
+    font-size: 38px;
+  }
+
+  #left-section {
+    max-height: none;
+  }
+}
+
+/* ===== Small Mobile ===== */
+
+@media (max-width: 480px) {
+  .logo {
+    font-size: 18px;
+  }
+
+  .total-amount {
+    font-size: 36px;
+  }
+
+  .stat-card .value {
+    font-size: 20px;
+  }
+
+  .action-card .btn-block {
+    font-size: 14px;
+  }
+}

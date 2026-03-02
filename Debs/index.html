@@ -1,0 +1,923 @@
+<!doctype html>
+<html lang="ru">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Учет Долгов - Вход</title>
+    <style>
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+      }
+
+      body,
+      html {
+        width: 100%;
+        height: 100%;
+        overflow: hidden;
+        font-family:
+          "Inter",
+          -apple-system,
+          BlinkMacSystemFont,
+          "Segoe UI",
+          Roboto,
+          sans-serif;
+      }
+
+      /* Контейнер для фона */
+      .landing-container {
+        position: relative;
+        width: 100vw;
+        height: 100vh;
+      }
+
+      /* Canvas для 3D фона */
+      #background-canvas {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        z-index: 0;
+        display: block;
+      }
+
+      /* Fallback фон если WebGL не работает */
+      .fallback-background {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        z-index: 0;
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      }
+
+      /* Контент поверх фона */
+      .content-overlay {
+        position: relative;
+        z-index: 10;
+        width: 100%;
+        height: 100%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        pointer-events: none;
+      }
+
+      /* Стеклянная карточка */
+      .glass-card {
+        pointer-events: auto;
+        background: rgba(255, 255, 255, 0.1);
+        backdrop-filter: blur(16px);
+        -webkit-backdrop-filter: blur(16px);
+        border: 1px solid rgba(255, 255, 255, 0.2);
+        padding: 3rem;
+        border-radius: 24px;
+        text-align: center;
+        box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+        max-width: 400px;
+        width: 90%;
+        animation: fadeIn 1s ease-out;
+      }
+
+      .title {
+        color: white;
+        font-size: 2.5rem;
+        font-weight: 800;
+        margin-bottom: 0.5rem;
+        text-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
+      }
+
+      .subtitle {
+        color: rgba(255, 255, 255, 0.8);
+        font-size: 1.1rem;
+        margin-bottom: 2.5rem;
+      }
+
+      .button-group {
+        display: flex;
+        flex-direction: column;
+        gap: 1rem;
+      }
+
+      .btn {
+        padding: 1rem 2rem;
+        border-radius: 12px;
+        font-size: 1rem;
+        font-weight: 600;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        border: none;
+        outline: none;
+      }
+
+      .btn:active {
+        transform: scale(0.95);
+      }
+
+      .btn-primary {
+        background: white;
+        color: #059669;
+        box-shadow: 0 4px 14px rgba(0, 0, 0, 0.1);
+      }
+
+      .btn-primary:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 6px 20px rgba(0, 0, 0, 0.15);
+      }
+
+      .btn-secondary {
+        background: rgba(255, 255, 255, 0.15);
+        color: white;
+        border: 1px solid rgba(255, 255, 255, 0.3);
+      }
+
+      .btn-secondary:hover {
+        background: rgba(255, 255, 255, 0.25);
+      }
+
+      .footer-note {
+        margin-top: 2rem;
+        color: rgba(255, 255, 255, 0.5);
+        font-size: 0.85rem;
+      }
+
+      /* Модальные окна */
+      .modal-overlay {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: rgba(0, 0, 0, 0.7);
+        backdrop-filter: blur(8px);
+        -webkit-backdrop-filter: blur(8px);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        z-index: 100;
+        opacity: 0;
+        visibility: hidden;
+        transition: all 0.3s ease;
+      }
+
+      .modal-overlay.active {
+        opacity: 1;
+        visibility: visible;
+      }
+
+      .modal-content {
+        background: rgba(255, 255, 255, 0.95);
+        backdrop-filter: blur(20px);
+        -webkit-backdrop-filter: blur(20px);
+        border-radius: 24px;
+        padding: 2.5rem;
+        max-width: 400px;
+        width: 90%;
+        transform: scale(0.9);
+        transition: transform 0.3s ease;
+      }
+
+      .modal-overlay.active .modal-content {
+        transform: scale(1);
+      }
+
+      .modal-title {
+        color: #1e293b;
+        font-size: 1.8rem;
+        font-weight: 700;
+        margin-bottom: 0.5rem;
+        text-align: center;
+      }
+
+      .modal-subtitle {
+        color: #64748b;
+        font-size: 0.9rem;
+        text-align: center;
+        margin-bottom: 2rem;
+      }
+
+      .form-group {
+        margin-bottom: 1.25rem;
+        text-align: left;
+      }
+
+      .form-label {
+        display: block;
+        color: #374151;
+        font-weight: 600;
+        margin-bottom: 0.5rem;
+        font-size: 0.9rem;
+      }
+
+      .form-input {
+        width: 100%;
+        padding: 0.875rem 1rem;
+        border: 2px solid #e5e7eb;
+        border-radius: 12px;
+        font-size: 1rem;
+        transition: all 0.2s;
+      }
+
+      .form-input:focus {
+        border-color: #059669;
+        outline: none;
+        box-shadow: 0 0 0 3px rgba(5, 150, 105, 0.1);
+      }
+
+      .modal-btn {
+        width: 100%;
+        padding: 0.875rem;
+        border-radius: 12px;
+        font-size: 1rem;
+        font-weight: 600;
+        cursor: pointer;
+        transition: all 0.2s;
+        border: none;
+        margin-top: 1rem;
+      }
+
+      .modal-btn:active {
+        transform: scale(0.95);
+      }
+
+      .modal-btn-primary {
+        background: linear-gradient(135deg, #059669, #047857);
+        color: white;
+      }
+
+      .modal-btn-secondary {
+        background: #e5e7eb;
+        color: #374151;
+      }
+
+      .close-modal {
+        position: absolute;
+        top: 1rem;
+        right: 1rem;
+        width: 32px;
+        height: 32px;
+        border-radius: 50%;
+        background: rgba(0, 0, 0, 0.1);
+        border: none;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1.2rem;
+        color: #64748b;
+        transition: all 0.2s;
+      }
+
+      .close-modal:hover {
+        background: rgba(0, 0, 0, 0.2);
+        color: #1e293b;
+      }
+
+      .modal-container {
+        position: relative;
+      }
+
+      .switch-form {
+        text-align: center;
+        margin-top: 1.5rem;
+        color: #64748b;
+        font-size: 0.9rem;
+      }
+
+      .switch-form a {
+        color: #059669;
+        text-decoration: none;
+        font-weight: 600;
+        cursor: pointer;
+      }
+
+      .switch-form a:hover {
+        text-decoration: underline;
+      }
+
+      .error-message {
+        color: #ef4444;
+        font-size: 0.85rem;
+        margin-top: 0.5rem;
+        display: none;
+      }
+
+      .success-message {
+        color: #059669;
+        font-size: 0.9rem;
+        text-align: center;
+        margin-top: 1rem;
+        display: none;
+      }
+
+      /* Toast уведомления */
+      .toast {
+        position: fixed;
+        top: 20px;
+        right: 20px;
+        padding: 16px 24px;
+        border-radius: 12px;
+        color: white;
+        font-weight: 600;
+        z-index: 2000;
+        animation: slideIn 0.3s ease;
+      }
+
+      @keyframes slideIn {
+        from {
+          transform: translateY(-100%);
+          opacity: 0;
+        }
+        to {
+          transform: translateY(0);
+          opacity: 1;
+        }
+      }
+
+      .toast-success {
+        background: #10b981;
+      }
+      .toast-error {
+        background: #ef4444;
+      }
+
+      @keyframes fadeIn {
+        from {
+          opacity: 0;
+          transform: translateY(20px);
+        }
+        to {
+          opacity: 1;
+          transform: translateY(0);
+        }
+      }
+
+      @media (max-width: 600px) {
+        .glass-card {
+          padding: 2rem;
+        }
+
+        .title {
+          font-size: 2rem;
+        }
+      }
+
+      /* Индикатор загрузки */
+      .loading-indicator {
+        position: fixed;
+        top: 20px;
+        left: 20px;
+        background: rgba(0, 0, 0, 0.7);
+        color: #00ff00;
+        padding: 10px 15px;
+        border-radius: 8px;
+        font-size: 12px;
+        font-family: monospace;
+        z-index: 1000;
+      }
+    </style>
+  </head>
+  <body>
+    <!-- Индикатор отладки -->
+    <div class="loading-indicator" id="debugInfo">Загрузка фона...</div>
+
+    <div class="landing-container">
+      <!-- Fallback фон -->
+      <div class="fallback-background" id="fallbackBg"></div>
+
+      <!-- Canvas для 3D фона -->
+      <canvas id="background-canvas"></canvas>
+
+      <!-- Контент поверх фона -->
+      <div class="content-overlay">
+        <div class="glass-card">
+          <h1 class="title">💰 Учет Долгов</h1>
+          <p class="subtitle">Контролируйте свои финансы красиво</p>
+
+          <div class="button-group">
+            <button class="btn btn-primary" id="loginBtn">
+              🔐 Войти в систему
+            </button>
+            <button class="btn btn-secondary" id="registerBtn">
+              📝 Регистрация
+            </button>
+          </div>
+
+          <div class="footer-note">🔒 Безопасное локальное хранение</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Modal: Login -->
+    <div class="modal-overlay" id="loginModal">
+      <div class="modal-content">
+        <div class="modal-container">
+          <button class="close-modal" onclick="closeModal('loginModal')">
+            ×
+          </button>
+          <h2 class="modal-title">Вход</h2>
+          <p class="modal-subtitle">Введите данные для входа</p>
+          <form onsubmit="return false;">
+            <div class="form-group">
+              <label class="form-label">Логин</label>
+              <input
+                type="text"
+                class="form-input"
+                id="loginUsername"
+                placeholder="Введите логин"
+              />
+              <div class="error-message" id="loginError"></div>
+            </div>
+            <div class="form-group">
+              <label class="form-label">Пароль</label>
+              <input
+                type="password"
+                class="form-input"
+                id="loginPassword"
+                placeholder="Введите пароль"
+              />
+            </div>
+            <button
+              type="submit"
+              class="modal-btn modal-btn-primary"
+              onclick="handleLoginSubmit()"
+            >
+              Войти
+            </button>
+          </form>
+          <div class="switch-form">
+            Нет аккаунта?
+            <a onclick="switchModal('loginModal', 'registerModal')"
+              >Зарегистрироваться</a
+            >
+          </div>
+          <div class="success-message" id="loginSuccess">
+            ✅ Успешный вход! Переходим...
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Modal: Register -->
+    <div class="modal-overlay" id="registerModal">
+      <div class="modal-content">
+        <div class="modal-container">
+          <button class="close-modal" onclick="closeModal('registerModal')">
+            ×
+          </button>
+          <h2 class="modal-title">Регистрация</h2>
+          <p class="modal-subtitle">Создайте новый аккаунт</p>
+          <form onsubmit="return false;">
+            <div class="form-group">
+              <label class="form-label">Логин</label>
+              <input
+                type="text"
+                class="form-input"
+                id="regUsername"
+                placeholder="Придумайте логин"
+              />
+              <div class="error-message" id="regUsernameError"></div>
+            </div>
+            <div class="form-group">
+              <label class="form-label">Email</label>
+              <input
+                type="email"
+                class="form-input"
+                id="regEmail"
+                placeholder="Ваш email"
+              />
+              <div class="error-message" id="regEmailError"></div>
+            </div>
+            <div class="form-group">
+              <label class="form-label">Пароль</label>
+              <input
+                type="password"
+                class="form-input"
+                id="regPassword"
+                placeholder="Придумайте пароль"
+              />
+              <div class="error-message" id="regPasswordError"></div>
+            </div>
+            <div class="form-group">
+              <label class="form-label">Подтверждение пароля</label>
+              <input
+                type="password"
+                class="form-input"
+                id="regPasswordConfirm"
+                placeholder="Повторите пароль"
+              />
+              <div class="error-message" id="regPasswordConfirmError"></div>
+            </div>
+            <button
+              type="submit"
+              class="modal-btn modal-btn-primary"
+              onclick="handleRegisterSubmit()"
+            >
+              Создать аккаунт
+            </button>
+          </form>
+          <div class="switch-form">
+            Уже есть аккаунт?
+            <a onclick="switchModal('registerModal', 'loginModal')">Войти</a>
+          </div>
+          <div class="success-message" id="registerSuccess">
+            ✅ Аккаунт создан! Переходим...
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div id="toastContainer"></div>
+
+    <!-- Three.js CDN -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+
+    <!-- Background Animation Script -->
+    <script>
+      // ==========================================================================
+      // АНИМИРОВАННЫЙ ФОН С ВОЛНАМИ
+      // ==========================================================================
+
+      (function () {
+        "use strict";
+
+        // Индикатор отладки
+        const debugInfo = document.getElementById("debugInfo");
+        const fallbackBg = document.getElementById("fallbackBg");
+        const canvas = document.getElementById("background-canvas");
+
+        function updateDebug(message, type) {
+          if (debugInfo) {
+            debugInfo.textContent = message;
+            debugInfo.style.color =
+              type === "error"
+                ? "#ff4444"
+                : type === "success"
+                  ? "#00ff00"
+                  : "#00ff00";
+          }
+          console.log("[Background]", message);
+        }
+
+        // Проверка поддержки WebGL
+        function isWebGLSupported() {
+          try {
+            const testCanvas = document.createElement("canvas");
+            const gl =
+              testCanvas.getContext("webgl") ||
+              testCanvas.getContext("experimental-webgl");
+            return !!gl;
+          } catch (e) {
+            return false;
+          }
+        }
+
+        // Проверка загрузки Three.js
+        function isThreeJSLoaded() {
+          return typeof THREE !== "undefined";
+        }
+
+        // Шейдеры
+        const vertexShader = `
+                varying vec2 vUv;
+                void main() {
+                    vUv = uv;
+                    gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0);
+                }
+            `;
+
+        const fragmentShader = `
+                varying vec2 vUv;
+                uniform float uTime;
+                uniform vec3 uColor;
+
+                void main() {
+                    vec2 uv = vUv;
+                    
+                    // Волновой эффект
+                    float wave = sin(uv.x * 10.0 + uTime) * 0.1;
+                    wave += sin(uv.y * 5.0 + uTime * 0.5) * 0.1;
+                    
+                    // Градиент
+                    float gradient = uv.y + wave;
+                    
+                    // Цвет
+                    vec3 color = uColor * gradient;
+                    
+                    gl_FragColor = vec4(color, 1.0);
+                }
+            `;
+
+        // Инициализация фона
+        function initBackground() {
+          updateDebug("Проверка WebGL...");
+
+          if (!isWebGLSupported()) {
+            updateDebug(
+              "WebGL не поддерживается, используется fallback",
+              "error",
+            );
+            if (fallbackBg) fallbackBg.style.display = "block";
+            if (canvas) canvas.style.display = "none";
+            return;
+          }
+
+          updateDebug("WebGL поддерживается");
+
+          if (!isThreeJSLoaded()) {
+            updateDebug("Three.js не загружен, используется fallback", "error");
+            if (fallbackBg) fallbackBg.style.display = "block";
+            if (canvas) canvas.style.display = "none";
+            return;
+          }
+
+          updateDebug("Three.js загружен, инициализация...");
+
+          try {
+            // Сцена
+            const scene = new THREE.Scene();
+
+            // Камера
+            const camera = new THREE.OrthographicCamera(-1, 1, 1, -1, 0, 1);
+
+            // Рендерер
+            const renderer = new THREE.WebGLRenderer({
+              canvas: canvas,
+              antialias: true,
+              alpha: true,
+            });
+
+            renderer.setSize(window.innerWidth, window.innerHeight);
+            renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+
+            updateDebug(
+              "Размер canvas: " + window.innerWidth + "x" + window.innerHeight,
+            );
+
+            // Uniforms
+            const uniforms = {
+              uTime: { value: 0 },
+              uColor: { value: new THREE.Color(0x059669) }, // Зеленый цвет
+            };
+
+            // Геометрия
+            const geometry = new THREE.PlaneGeometry(2, 2);
+
+            // Материал
+            const material = new THREE.ShaderMaterial({
+              uniforms: uniforms,
+              vertexShader: vertexShader,
+              fragmentShader: fragmentShader,
+            });
+
+            // Меш
+            const mesh = new THREE.Mesh(geometry, material);
+            scene.add(mesh);
+
+            updateDebug("Сцена создана успешно", "success");
+
+            // Скрыть fallback
+            if (fallbackBg) fallbackBg.style.display = "none";
+
+            // Анимация
+            const clock = new THREE.Clock();
+
+            function animate() {
+              requestAnimationFrame(animate);
+              uniforms.uTime.value = clock.getElapsedTime();
+              renderer.render(scene, camera);
+            }
+
+            animate();
+
+            // Изменение размера
+            window.addEventListener("resize", function () {
+              renderer.setSize(window.innerWidth, window.innerHeight);
+              updateDebug(
+                "Размер изменен: " +
+                  window.innerWidth +
+                  "x" +
+                  window.innerHeight,
+              );
+            });
+          } catch (error) {
+            updateDebug("Ошибка инициализации: " + error.message, "error");
+            if (fallbackBg) fallbackBg.style.display = "block";
+            if (canvas) canvas.style.display = "none";
+          }
+        }
+
+        // Запуск после загрузки DOM
+        if (document.readyState === "loading") {
+          document.addEventListener("DOMContentLoaded", initBackground);
+        } else {
+          initBackground();
+        }
+      })();
+    </script>
+
+    <!-- Auth Logic -->
+    <script>
+      // ==================== AUTH FUNCTIONS ====================
+
+      function hashPassword(password) {
+        let hash = 0,
+          salt = "debts_salt_2024_secure",
+          str = password + salt;
+        for (let i = 0; i < str.length; i++) {
+          const char = str.charCodeAt(i);
+          hash = (hash << 5) - hash + char;
+          hash = hash & hash;
+        }
+        return Math.abs(hash).toString(16);
+      }
+
+      function generateUserId() {
+        return (
+          "USR-" +
+          Date.now().toString(36) +
+          "-" +
+          Math.random().toString(36).substring(2, 8).toUpperCase()
+        );
+      }
+
+      function showToast(message, type) {
+        const container = document.getElementById("toastContainer");
+        const toast = document.createElement("div");
+        toast.className = "toast toast-" + type;
+        toast.textContent = message;
+        container.appendChild(toast);
+        setTimeout(() => toast.remove(), 3000);
+      }
+
+      function openModal(id) {
+        document.getElementById(id).classList.add("active");
+      }
+
+      function closeModal(id) {
+        document.getElementById(id).classList.remove("active");
+      }
+
+      function switchModal(from, to) {
+        closeModal(from);
+        setTimeout(() => openModal(to), 300);
+      }
+
+      function handleLoginSubmit() {
+        const username = document
+          .getElementById("loginUsername")
+          .value.trim()
+          .toLowerCase();
+        const password = document.getElementById("loginPassword").value;
+        const errorEl = document.getElementById("loginError");
+        const successEl = document.getElementById("loginSuccess");
+
+        errorEl.style.display = "none";
+        successEl.style.display = "none";
+
+        if (!username || !password) {
+          errorEl.textContent = "Заполните все поля";
+          errorEl.style.display = "block";
+          return;
+        }
+
+        const users = JSON.parse(
+          localStorage.getItem("debts_users_v2") || "{}",
+        );
+        const user = users[username];
+
+        if (!user) {
+          errorEl.textContent = "Пользователь не найден";
+          errorEl.style.display = "block";
+          return;
+        }
+
+        if (user.password !== hashPassword(password)) {
+          errorEl.textContent = "Неверный пароль";
+          errorEl.style.display = "block";
+          return;
+        }
+
+        successEl.style.display = "block";
+        localStorage.setItem(
+          "debts_session_v2",
+          JSON.stringify({
+            userId: user.userId,
+            createdAt: new Date().toISOString(),
+          }),
+        );
+
+        setTimeout(() => {
+          window.location.href = "debts-app/index.html";
+        }, 1000);
+      }
+
+      function handleRegisterSubmit() {
+        const username = document
+          .getElementById("regUsername")
+          .value.trim()
+          .toLowerCase();
+        const email = document.getElementById("regEmail").value.trim();
+        const password = document.getElementById("regPassword").value;
+        const passwordConfirm =
+          document.getElementById("regPasswordConfirm").value;
+
+        document
+          .querySelectorAll("#registerModal .error-message")
+          .forEach((el) => (el.style.display = "none"));
+        document.getElementById("registerSuccess").style.display = "none";
+
+        let hasError = false;
+
+        if (username.length < 3) {
+          document.getElementById("regUsernameError").textContent =
+            "Минимум 3 символа";
+          document.getElementById("regUsernameError").style.display = "block";
+          hasError = true;
+        }
+
+        if (!email || !email.includes("@")) {
+          document.getElementById("regEmailError").textContent =
+            "Введите корректный email";
+          document.getElementById("regEmailError").style.display = "block";
+          hasError = true;
+        }
+
+        if (password.length < 6) {
+          document.getElementById("regPasswordError").textContent =
+            "Минимум 6 символов";
+          document.getElementById("regPasswordError").style.display = "block";
+          hasError = true;
+        }
+
+        if (password !== passwordConfirm) {
+          document.getElementById("regPasswordConfirmError").textContent =
+            "Пароли не совпадают";
+          document.getElementById("regPasswordConfirmError").style.display =
+            "block";
+          hasError = true;
+        }
+
+        if (hasError) return;
+
+        const users = JSON.parse(
+          localStorage.getItem("debts_users_v2") || "{}",
+        );
+
+        if (users[username]) {
+          document.getElementById("regUsernameError").textContent =
+            "Пользователь уже существует";
+          document.getElementById("regUsernameError").style.display = "block";
+          return;
+        }
+
+        const userId = generateUserId();
+        users[username] = {
+          userId: userId,
+          username: username,
+          email: email,
+          password: hashPassword(password),
+          createdAt: new Date().toISOString(),
+        };
+
+        localStorage.setItem("debts_users_v2", JSON.stringify(users));
+        localStorage.setItem("debts_data_" + userId, JSON.stringify([]));
+        localStorage.setItem(
+          "debts_session_v2",
+          JSON.stringify({
+            userId: userId,
+            createdAt: new Date().toISOString(),
+          }),
+        );
+
+        document.getElementById("registerSuccess").style.display = "block";
+
+        setTimeout(() => {
+          window.location.href = "debts-app/index.html";
+        }, 1000);
+      }
+
+      // ==================== INIT ====================
+
+      document.addEventListener("DOMContentLoaded", function () {
+        document
+          .getElementById("loginBtn")
+          .addEventListener("click", () => openModal("loginModal"));
+        document
+          .getElementById("registerBtn")
+          .addEventListener("click", () => openModal("registerModal"));
+
+        document.querySelectorAll(".modal-overlay").forEach((modal) => {
+          modal.addEventListener("click", (e) => {
+            if (e.target === modal) {
+              closeModal(modal.id);
+            }
+          });
+        });
+      });
+    </script>
+  </body>
+</html>
