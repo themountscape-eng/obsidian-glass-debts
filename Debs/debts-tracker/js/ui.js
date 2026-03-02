@@ -55,12 +55,13 @@ function renderFeed() {
 function renderLayout() {
   let userName = "Гость";
   let debts = [];
+
   try {
     if (typeof getUserData === "function")
       userName = getUserData().name || "Гость";
     if (typeof getDebts === "function") debts = getDebts();
   } catch (e) {
-    console.error("Ошибка данных:", e);
+    console.error("Ошибка загрузки данных в UI:", e);
   }
 
   const activeDebts = debts.filter((d) => !d.paid);
@@ -76,20 +77,20 @@ function renderLayout() {
   const transferStr = transferSum.toLocaleString("ru-RU") + " ₽";
   const cashStr = cashSum.toLocaleString("ru-RU") + " ₽";
 
-  // РЕНДЕР ХЕДЕРА (Убрана лишняя обертка, мешающая стилям)
+  // --- 1. ХЕДЕР (Исправляем вложенность под твой CSS) ---
   const headerEl = document.getElementById("app-header");
   if (headerEl) {
-    headerEl.className = "app-header glass"; // Классы теперь прямо на контейнере
+    headerEl.className = "app-header glass"; // Применяем классы к самому контейнеру
     headerEl.innerHTML = `
-        <div class="header-content">
-          <div class="logo">${iconWallet(24)} <span>Учет Долгов</span></div>
-          <div class="user-profile">
-            <span id="headerUserName">${userName}</span> ${iconUser(18)}
-          </div>
-        </div>`;
+      <div class="header-content">
+        <div class="logo">${iconWallet(24)} <span>Учет Долгов</span></div>
+        <div class="user-profile">
+          <span id="headerUserName">${userName}</span> ${iconUser(18)}
+        </div>
+      </div>`;
   }
 
-  // РЕНДЕР ГЛАВНОГО БЛОКА
+  // --- 2. ЛЕВАЯ СЕКЦИЯ ---
   const leftSec = document.getElementById("left-section");
   if (leftSec) {
     const fontSize = getAmountFontSize(totalStr, "main");
@@ -106,7 +107,7 @@ function renderLayout() {
       </div>`;
   }
 
-  // РЕНДЕР СТАТИСТИКИ И КНОПОК (Очистка + 6 колонок)
+  // --- 3. СТАТИСТИКА И КНОПКИ (Ровно 6 колонок под stats-row) ---
   const statsRow = document.getElementById("stats-row");
   if (statsRow) {
     statsRow.innerHTML = `
@@ -122,13 +123,17 @@ function renderLayout() {
       </button>`;
   }
 
-  // СРЕДНЯЯ СЕКЦИЯ
+  // --- 4. СРЕДНЯЯ СЕКЦИЯ ---
   const midSec = document.getElementById("middle-section");
   if (midSec) {
-    midSec.innerHTML = `<div class="chart-section glass"><h3>${iconChart(18)} Распределение</h3><canvas id="pieChart"></canvas></div>`;
+    midSec.innerHTML = `
+      <div class="chart-section glass">
+        <h3>${iconChart(18)} Распределение</h3>
+        <canvas id="pieChart"></canvas>
+      </div>`;
   }
 
-  // ПРАВАЯ СЕКЦИЯ
+  // --- 5. ПРАВАЯ СЕКЦИЯ ---
   const rightSec = document.getElementById("right-section");
   if (rightSec) {
     rightSec.innerHTML = `
