@@ -1,67 +1,87 @@
+console.log("CHARTS JS LOADED");
+// ============================================================================
+// CHARTS.JS
+// Отрисовка диаграммы должников + анимации + тренд
+// ============================================================================
+
 let chartInstance = null;
 
-// Палитра современных цветов
-const CHART_COLORS = [
-  "rgba(16, 185, 129, 0.85)",
-  "rgba(6, 182, 212, 0.85)",
-  "rgba(99, 102, 241, 0.85)",
-  "rgba(244, 63, 94, 0.85)",
-  "rgba(251, 191, 36, 0.85)",
-  "rgba(168, 85, 247, 0.85)",
-  "rgba(34, 211, 238, 0.85)",
-  "rgba(74, 222, 128, 0.85)",
-];
+// ----------------------------------------------------------------------------
+// Палитра современных цветов диаграммы
+// ----------------------------------------------------------------------------
+const CHART_COLORS = ["#34d399", "#60a5fa", "#a78bfa", "#f472b6"];
 
+// ----------------------------------------------------------------------------
+// Форматирование суммы
+// ----------------------------------------------------------------------------
 function formatAmount(value) {
   return String(Math.round(value)).replace(/\B(?=(\d{3})+(?!\d))/g, " ") + " ₽";
 }
 
+// ----------------------------------------------------------------------------
+// Форматирование имени должника
+// ----------------------------------------------------------------------------
 function formatDebtorName(name) {
   if (!name || !name.trim()) return "Без имени";
+
   const s = name.trim();
+
   const formatted = s.charAt(0).toUpperCase() + s.slice(1).toLowerCase();
+
   return formatted.length > 15 ? formatted.slice(0, 13) + "…" : formatted;
 }
 
+// ----------------------------------------------------------------------------
+// Группировка долгов по должникам
+// ----------------------------------------------------------------------------
 function getDebtsByDebtor() {
   const debts = typeof getDebts === "function" ? getDebts() : [];
+
   const byName = {};
 
   debts.forEach((d) => {
     if (!d.paid && d.amount > 0) {
-      const name = (d.debtorName || "Без имени").trim();
+      const name = (d.debtorName || d.name || "Без имени").trim();
+
       byName[name] = (byName[name] || 0) + d.amount;
     }
   });
 
   const total = Object.values(byName).reduce((s, a) => s + a, 0);
+
   const list = Object.entries(byName).map(([name, amount]) => ({
     name: formatDebtorName(name),
+
     fullName: name,
+
     amount,
+
     percent: total > 0 ? (amount / total) * 100 : 0,
   }));
 
   list.sort((a, b) => b.amount - a.amount);
+
   return { list, total };
 }
 
-/**
- * АНИМАЦИЯ ЧИСЕЛ С ЗАМЕДЛЕНИЕМ (Ease Out)
- */
+// ----------------------------------------------------------------------------
+// АНИМАЦИЯ ЧИСЕЛ (дорогой easing)
+// ----------------------------------------------------------------------------
 function animateValue(obj, start, end, duration) {
   if (!obj) return;
+
   let startTimestamp = null;
 
   const step = (timestamp) => {
     if (!startTimestamp) startTimestamp = timestamp;
+
     const progress = Math.min((timestamp - startTimestamp) / duration, 1);
 
-    // Кубическое замедление для "дорогого" эффекта
-    const easeOutProgress = 1 - Math.pow(1 - progress, 3);
-    const currentValue = Math.floor(easeOutProgress * (end - start) + start);
+    const easeOut = 1 - Math.pow(1 - progress, 3);
 
-    obj.innerHTML = currentValue.toLocaleString("ru-RU") + " ₽";
+    const current = Math.floor(easeOut * (end - start) + start);
+
+    obj.innerHTML = current.toLocaleString("ru-RU") + " ₽";
 
     if (progress < 1) {
       window.requestAnimationFrame(step);
@@ -71,29 +91,34 @@ function animateValue(obj, start, end, duration) {
   window.requestAnimationFrame(step);
 }
 
-/**
- * ОБРАБОТКА И ВЫВОД ТРЕНДА (%)
- */
+// ----------------------------------------------------------------------------
+// Обновление плашки тренда
+// ----------------------------------------------------------------------------
 function updateTrend(currentTotal) {
   const trendContainer = document.getElementById("trend-container");
+
   if (!trendContainer) return;
 
-  // 1. Получаем прошлое значение
   let lastTotal = localStorage.getItem("dashboard_last_total");
 
-  // Если это самый первый запуск в истории
+  // первый запуск
   if (lastTotal === null) {
     localStorage.setItem("dashboard_last_total", currentTotal);
-    trendContainer.innerHTML = `<div class="debt-trend trend-neutral">0% <small>старт</small></div>`;
+
+    trendContainer.innerHTML = `<div class="debt-trend trend-neutral">
+        0% <small>старт</small>
+      </div>`;
+
     return;
   }
 
   lastTotal = parseFloat(lastTotal);
+
   const diff = currentTotal - lastTotal;
 
-  // 2. Если сумма изменилась (добавили или списали долг)
   if (diff !== 0) {
     let percent = 0;
+
     if (lastTotal !== 0) {
       percent = Math.abs((diff / lastTotal) * 100).toFixed(0);
     } else {
@@ -101,6 +126,7 @@ function updateTrend(currentTotal) {
     }
 
     const isUp = diff > 0;
+
     const trendHTML = `
       <div class="debt-trend ${isUp ? "trend-up" : "trend-down"}">
         <span>${isUp ? "▲" : "▼"}</span>
@@ -109,53 +135,60 @@ function updateTrend(currentTotal) {
       </div>
     `;
 
-    // Сохраняем не только сумму, но и сам HTML плашки, чтобы он не исчезал при перезагрузке
     trendContainer.innerHTML = trendHTML;
+
     localStorage.setItem("dashboard_trend_html", trendHTML);
 
-    // Обновляем базу только ПРИ ИЗМЕНЕНИИ, чтобы в следующий раз считать от этой цифры
     localStorage.setItem("dashboard_last_total", currentTotal);
   } else {
-    // 3. Если сумма НЕ изменилась (просто обновили страницу)
-    // Достаем сохраненный ранее HTML плашки
-    const savedTrend = localStorage.getItem("dashboard_trend_html");
-    if (savedTrend) {
-      trendContainer.innerHTML = savedTrend;
+    const saved = localStorage.getItem("dashboard_trend_html");
+
+    if (saved) {
+      trendContainer.innerHTML = saved;
     } else {
-      trendContainer.innerHTML = `<div class="debt-trend trend-neutral">0% <small>стабильно</small></div>`;
+      trendContainer.innerHTML = `<div class="debt-trend trend-neutral">
+         0% <small>стабильно</small>
+        </div>`;
     }
   }
 }
 
-/**
- * ГЛАВНАЯ ФУНКЦИЯ ОТРИСОВКИ
- */
+// ----------------------------------------------------------------------------
+// ОСНОВНАЯ ФУНКЦИЯ ОТРИСОВКИ ДИАГРАММЫ
+// ----------------------------------------------------------------------------
 function renderChart() {
   const { list, total } = getDebtsByDebtor();
 
-  // 1. Обновляем метку тренда
+  // обновляем тренд
   updateTrend(total);
 
-  // 2. Анимируем главную сумму (ищем строго по ID)
+  // анимация главной суммы
   const totalDisplay = document.getElementById("totalAmount");
 
   if (totalDisplay) {
-    // Проверяем, не пустой ли total
+    const current = parseInt(totalDisplay.innerText.replace(/\D/g, "")) || 0;
+
     if (total > 0) {
-      animateValue(totalDisplay, 0, total, 2000);
+      animateValue(totalDisplay, current, total, 1200);
     } else {
       totalDisplay.innerHTML = "0 ₽";
     }
   }
 
-  const canvas = document.getElementById("pieChart");
+  const canvas = document.getElementById("debtorsChart");
+
   if (!canvas) return;
 
   const ctx = canvas.getContext("2d");
-  if (chartInstance) chartInstance.destroy();
 
+  if (chartInstance instanceof Chart) {
+    chartInstance.destroy();
+  }
+
+  // если долгов нет
   if (list.length === 0) {
     drawEmptyState(ctx, canvas);
+
     return;
   }
 
@@ -163,64 +196,72 @@ function renderChart() {
   const data = list.map((d) => d.amount);
   const colors = list.map((_, i) => CHART_COLORS[i % CHART_COLORS.length]);
 
+  // ---- фикс маленьких сегментов ----
+
   chartInstance = new Chart(ctx, {
     type: "doughnut",
+
     data: {
       labels,
+
       datasets: [
         {
-          data,
+          data: data,
           backgroundColor: colors,
-          borderColor: "rgba(255, 255, 255, 0.05)",
-          borderWidth: 0,
-          borderRadius: 8,
-          spacing: 8,
-          cutout: "78%",
-          hoverOffset: 15,
+
+          borderColor: "#021c17",
+          borderWidth: 6,
+          spacing: 0,
+          borderRadius: 0,
+
+          hoverOffset: 6,
         },
       ],
     },
+
     options: {
       responsive: true,
       maintainAspectRatio: true,
-      aspectRatio: 1,
-      layout: { padding: 15 },
+
+      cutout: "74%",
+
+      layout: {
+        padding: 20,
+      },
+
       animation: {
         duration: 1500,
         easing: "easeOutQuart",
       },
+
       plugins: {
         legend: {
-          display: true,
-          position: "bottom",
-          labels: {
-            color: "rgba(255, 255, 255, 0.7)",
-            padding: 20,
-            usePointStyle: true,
-            pointStyle: "circle",
-            font: { family: "Inter", size: 12, weight: "500" },
-            generateLabels: (chart) => {
-              return chart.data.labels.map((label, i) => ({
-                text: label.toUpperCase(),
-                fillStyle: chart.data.datasets[0].backgroundColor[i],
-                index: i,
-              }));
-            },
-          },
+          display: false,
         },
+
         tooltip: {
-          backgroundColor: "rgba(10, 10, 10, 0.95)",
-          titleFont: { family: "Inter", size: 14, weight: "bold" },
-          bodyFont: { family: "Inter", size: 13 },
+          backgroundColor: "rgba(10,10,10,0.95)",
           padding: 16,
-          borderColor: "rgba(255, 255, 255, 0.1)",
+          borderColor: "rgba(255,255,255,0.1)",
           borderWidth: 1,
           displayColors: true,
           boxPadding: 6,
+
+          titleFont: {
+            family: "Inter",
+            size: 14,
+            weight: "bold",
+          },
+
+          bodyFont: {
+            family: "Inter",
+            size: 13,
+          },
+
           callbacks: {
             label: (context) => {
               const item = list[context.dataIndex];
-              return ` ${formatAmount(item.amount)} (${item.percent.toFixed(1)}%)`;
+              return ` ${formatAmount(item.amount)}`;
             },
           },
         },
@@ -229,21 +270,34 @@ function renderChart() {
   });
 }
 
+// ----------------------------------------------------------------------------
+// Отрисовка состояния "нет данных"
+// ----------------------------------------------------------------------------
 function drawEmptyState(g, canvas) {
   const dpr = window.devicePixelRatio || 1;
+
   const rect = canvas.getBoundingClientRect();
+
   canvas.width = rect.width * dpr;
   canvas.height = rect.height * dpr;
+
   g.scale(dpr, dpr);
 
-  g.strokeStyle = "rgba(255, 255, 255, 0.05)";
+  g.strokeStyle = "rgba(255,255,255,0.05)";
+
   g.lineWidth = 15;
+
   g.beginPath();
+
   g.arc(rect.width / 2, rect.height / 2, 60, 0, Math.PI * 2);
+
   g.stroke();
 
-  g.fillStyle = "rgba(255, 255, 255, 0.3)";
+  g.fillStyle = "rgba(255,255,255,0.3)";
+
   g.font = "500 14px Inter, sans-serif";
+
   g.textAlign = "center";
+
   g.fillText("Активных долгов нет", rect.width / 2, rect.height / 2 + 5);
 }
