@@ -8,48 +8,122 @@
   --accent-error: #ff4757;
   --accent-warning: #fbbf24;
   --accent-info: #00d4ff;
+  --radius-lg: 24px;
+  --radius-md: 18px;
+  --radius-sm: 12px;
   --main-padding: 24px;
+  --shadow-soft: 0 8px 32px rgba(0, 0, 0, 0.3);
+  --chart-1: #34d399;
+  --chart-2: #10b981;
+  --chart-3: #0f855d;
 }
 
+/* ==========================================================================
+   2. RESET
+   ========================================================================== */
 * {
   box-sizing: border-box;
   margin: 0;
   padding: 0;
 }
 
+/* ==========================================================================
+   3. BODY & FONTS
+   ========================================================================== */
 body {
   background: radial-gradient(circle at top right, #1a1c2c, #0d0e14);
   color: #fff;
   font-family:
     "Inter",
     -apple-system,
+    BlinkMacSystemFont,
+    "Segoe UI",
     sans-serif;
-  height: 100vh;
-  width: 100vw;
-  overflow: hidden;
-}
-
-.glass {
-  background: var(--glass-bg);
-  backdrop-filter: blur(12px);
-  -webkit-backdrop-filter: blur(12px);
-  border: 1px solid var(--glass-border);
-  border-radius: 24px;
-  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+  min-height: 100vh;
+  width: 100%;
+  overflow-x: hidden;
+  -webkit-font-smoothing: antialiased;
 }
 
 /* ==========================================================================
-   2. КОНТЕЙНЕР И ИСПРАВЛЕННЫЙ HEADER
+   4. БАЗОВЫЕ КОМПОНЕНТЫ
+   ========================================================================== */
+
+.glass {
+  background: linear-gradient(
+    160deg,
+    rgba(255, 255, 255, 0.1),
+    rgba(255, 255, 255, 0.04)
+  );
+
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+
+  border-radius: var(--radius-lg);
+
+  border: 1px solid rgba(255, 255, 255, 0.14);
+
+  box-shadow:
+    0 10px 36px rgba(0, 0, 0, 0.45),
+    inset 0 1px 0 rgba(255, 255, 255, 0.18),
+    inset 0 -1px 0 rgba(255, 255, 255, 0.05);
+
+  position: relative;
+  overflow: hidden;
+}
+
+.glass::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  pointer-events: none;
+
+  background: linear-gradient(
+    120deg,
+    rgba(255, 255, 255, 0.14),
+    rgba(255, 255, 255, 0.02) 45%,
+    transparent 65%
+  );
+}
+
+.modal-content.glass {
+  background: rgba(0, 0, 0, 0.45);
+  backdrop-filter: blur(24px);
+}
+
+.modal-content.glass::before {
+  display: none;
+}
+
+.glass {
+  background: linear-gradient(
+    160deg,
+    rgba(255, 255, 255, 0.1),
+    rgba(255, 255, 255, 0.04)
+  );
+}
+
+.card {
+  display: flex;
+  flex-direction: column;
+  border-radius: var(--radius-lg);
+}
+
+/* ==========================================================================
+   5. КОНТЕЙНЕР
    ========================================================================== */
 .container {
   display: flex;
   flex-direction: column;
-  height: 100vh;
+  min-height: 100vh;
   padding: var(--main-padding) 30px;
   gap: 20px;
-  box-sizing: border-box;
 }
 
+/* ==========================================================================
+   6. HEADER
+   ========================================================================== */
 .app-header {
   width: 100%;
   flex-shrink: 0;
@@ -61,7 +135,7 @@ body {
   justify-content: space-between;
   align-items: center;
   padding: 0 25px;
-  height: 70px; /* Фиксированная высота шапки */
+  height: 70px;
 }
 
 .logo {
@@ -70,7 +144,6 @@ body {
   gap: 12px;
   font-weight: 800;
   font-size: 20px;
-  color: #fff;
 }
 
 .user-profile {
@@ -80,18 +153,17 @@ body {
   background: rgba(255, 255, 255, 0.05);
   padding: 8px 16px;
   border-radius: 14px;
-  font-size: 14px;
   border: 1px solid var(--glass-border);
+  font-size: 14px;
 }
 
 /* ==========================================================================
-   3. ГЛАВНАЯ СЕТКА (Layout)
+   7. ОСНОВНАЯ СЕТКА
    ========================================================================== */
 .main-wrapper {
   display: grid;
   grid-template-columns: repeat(6, 1fr);
-  /* Теперь 3 ряда: 400px (верх), 150px (статы), остаток (активность) */
-  grid-template-rows: 400px 150px 1fr;
+  grid-template-rows: minmax(320px, 380px) 150px 1fr;
   gap: 24px;
   flex: 1;
   min-height: 0;
@@ -100,6 +172,7 @@ body {
 #left-section {
   grid-column: span 4;
 }
+
 #middle-section {
   grid-column: span 2;
 }
@@ -121,7 +194,7 @@ body {
 }
 
 /* ==========================================================================
-   4. ВЕРХНИЕ БЛОКИ (400px)
+   8. ВЕРХНИЕ БЛОКИ
    ========================================================================== */
 .main-block,
 .chart-section {
@@ -129,52 +202,67 @@ body {
   padding: 30px;
   display: flex;
   flex-direction: column;
+  overflow: hidden;
+  min-height: 320px;
 }
 
 .main-block {
-  justify-content: space-between;
+  position: relative;
 }
 
 .welcome-text {
   font-size: 14px;
   text-transform: uppercase;
+  letter-spacing: 1px;
   color: rgba(255, 255, 255, 0.4);
 }
+
 .user-name {
-  font-size: 32px;
+  font-size: 38px;
   font-weight: 800;
   margin-top: 5px;
 }
-.total-amount {
-  font-weight: 900;
-  line-height: 0.9;
-  letter-spacing: -2px;
+
+.debt-section {
+  margin-top: auto;
 }
 
+.total-amount {
+  font-size: 80px;
+  font-weight: 900;
+}
+
+/* Тренд долга */
 .debt-trend {
+  position: absolute;
+  top: 30px;
+  right: 30px;
   display: inline-flex;
-  padding: 6px 12px;
-  border-radius: 10px;
+  align-items: center;
+  padding: 8px 14px;
+  border-radius: var(--radius-sm);
   font-size: 13px;
   font-weight: 700;
-  width: fit-content;
-  margin: 10px 0;
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid var(--glass-border);
 }
+
 .trend-up {
-  background: rgba(255, 71, 87, 0.15);
-  color: var(--accent-error);
+  color: #ff5b5b;
+  font-weight: 600;
 }
+
 .trend-down {
-  background: rgba(0, 255, 157, 0.15);
-  color: var(--accent-success);
+  color: #35d07f;
+  font-weight: 600;
 }
+
 .trend-neutral {
-  background: rgba(255, 255, 255, 0.1);
-  color: rgba(255, 255, 255, 0.5);
+  opacity: 0.6;
 }
 
 /* ==========================================================================
-   5. СТАТИСТИКА И КНОПКИ (150px) - ИСПРАВЛЕНО
+   9. СТАТИСТИКА (stat-card)
    ========================================================================== */
 .stat-card {
   padding: 20px;
@@ -184,8 +272,9 @@ body {
 }
 
 .stat-card .value {
-  font-size: 26px;
+  font-size: 28px;
   font-weight: 800;
+  margin-top: 22px;
 }
 
 .stat-card-label {
@@ -194,46 +283,231 @@ body {
   opacity: 0.4;
 }
 
-/* Кнопки "Добавить" и "Погасить" */
+/* ==========================================================================
+   10. СПИСОК ДОЛГОВ (общий + списание)
+   ========================================================================== */
+.debts-list {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin-top: 21px;
+  max-height: 460px;
+  overflow-y: auto;
+  padding-right: 10px;
+
+  scroll-behavior: smooth;
+  scrollbar-width: thin;
+  scrollbar-color: rgba(255, 255, 255, 0.1) transparent;
+}
+
+.debts-list::-webkit-scrollbar {
+  width: 4px;
+}
+
+.debts-list::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 10px;
+}
+
+.debt-item-row,
+.debt-card {
+  display: flex;
+  padding: 10px 12px;
+  border-radius: 10px;
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid var(--glass-border);
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.debt-item-row {
+  justify-content: space-between;
+}
+
+.debt-card {
+  flex-direction: column;
+  gap: 6px;
+  padding: 14px 16px;
+  border-radius: 14px;
+}
+
+.debt-item-row:hover,
+.debt-card:hover {
+  background: rgba(255, 255, 255, 0.08);
+  border-color: rgba(255, 255, 255, 0.25);
+}
+
+.debt-item-row.selected,
+.debt-card.selected {
+  border-color: var(--accent-success);
+  background: rgba(0, 255, 157, 0.08);
+}
+
+.debts-header,
+.debt-row-top {
+  display: flex;
+  justify-content: space-between;
+  font-size: 12px;
+  padding: 0 0 6px 0;
+}
+
+.debt-row-bottom {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.debt-date,
+.debt-label {
+  font-size: 12px;
+  color: rgba(255, 255, 255, 0.397);
+}
+
+.debt-name {
+  font-size: 15px;
+  font-weight: 600;
+}
+
+.debt-amount {
+  font-size: 16px;
+  font-weight: 700;
+}
+
+/* ==========================================================================
+   БЛОК "СПИСАТЬ ВСЁ"
+   ========================================================================== */
+
+.writeoff-box {
+  margin-top: 0px;
+  padding: 12px 16px;
+
+  border-radius: 14px;
+  border: 1px solid var(--glass-border);
+  background: rgba(255, 255, 255, 0.05);
+
+  transition:
+    background 0.25s ease,
+    border-color 0.25s ease;
+}
+
+.writeoff-box:hover {
+  background: rgba(255, 255, 255, 0.08);
+}
+
+.writeoff-toggle {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+
+  width: 100%;
+}
+
+.writeoff-text {
+  font-size: 14px;
+}
+
+/* ЧЕКБОКС */
+
+.writeoff-toggle input[type="checkbox"] {
+  appearance: none;
+  -webkit-appearance: none;
+
+  width: 18px;
+  height: 18px;
+
+  border-radius: 5px;
+
+  border: 1px solid rgba(255, 255, 255, 0.35);
+  background: rgba(255, 255, 255, 0.06);
+
+  display: grid;
+  place-content: center;
+
+  margin: 0;
+  flex-shrink: 0;
+
+  cursor: pointer;
+}
+
+/* галочка */
+
+.writeoff-toggle input[type="checkbox"]::before {
+  content: "";
+
+  width: 10px;
+  height: 10px;
+
+  background: var(--accent-success);
+  border-radius: 2px;
+
+  transform: scale(0);
+  transition: transform 0.15s ease;
+}
+
+/* checked */
+
+.writeoff-toggle input[type="checkbox"]:checked {
+  border-color: var(--accent-success);
+  background: rgba(0, 255, 157, 0.12);
+}
+
+.writeoff-toggle input[type="checkbox"]:checked::before {
+  transform: scale(1);
+}
+
+/* активный блок */
+
+.writeoff-box.active {
+  border-color: var(--accent-success);
+  background: rgba(0, 255, 157, 0.08);
+}
+
+.writeoff-box.active .writeoff-text {
+  color: var(--accent-success);
+  font-weight: 600;
+}
+
+/* ==========================================================================
+   11. КНОПКИ ДЕЙСТВИЙ / TILES
+   ========================================================================== */
+
 .action-card {
   cursor: pointer;
   border: 1px solid var(--glass-border);
-  background: var(--glass-bg); /* Используем переменную стекла напрямую */
-  backdrop-filter: blur(12px);
-  border-radius: 24px;
-  padding: 0;
-  outline: none;
-  transition:
-    background 0.2s ease,
-    border-color 0.2s ease;
+  background: var(--glass-bg);
+  border-radius: var(--radius-lg);
+  transition: all 0.25s ease;
   overflow: hidden;
-  display: block; /* Гарантируем корректное отображение */
 }
 
 .action-card:hover {
   background: rgba(255, 255, 255, 0.1);
   border-color: rgba(255, 255, 255, 0.2);
+  transform: translateY(-2px);
 }
 
 .btn-tile {
-  width: 100%;
   height: 100%;
   padding: 20px;
   display: flex;
   flex-direction: column;
   justify-content: space-between;
   align-items: flex-start;
-  border-radius: 24px;
-  pointer-events: none; /* Чтобы клик пролетал сразу на кнопку */
+  pointer-events: none;
 }
 
-/* Цвета для плиток */
+/* ЗЕЛЕНАЯ КНОПКА */
 .btn-success-tile {
-  color: var(--accent-success);
+  color: #10b981;
 }
 
 .btn-outline-tile {
-  color: var(--accent-warning);
+  color: rgba(255, 255, 255, 0.8);
+}
+
+.btn-outline-tile:hover {
+  background: rgba(16, 185, 129, 0.16);
+  border-color: rgba(16, 185, 129, 0.6);
 }
 
 .action-title {
@@ -243,109 +517,447 @@ body {
 }
 
 /* ==========================================================================
-   6. НИЖНИЕ БЛОКИ (Scrollable)
+   12. НИЖНИЕ БЛОКИ (лента + советы)
    ========================================================================== */
 .feed-section {
   grid-column: span 4;
   padding: 24px;
+  min-height: 0;
   display: flex;
   flex-direction: column;
-  min-height: 0;
+  overflow: hidden;
 }
+
 .tips-section {
   grid-column: span 2;
   padding: 24px;
+  min-height: 0;
   display: flex;
   flex-direction: column;
-  min-height: 0;
-}
-
-h3 {
-  font-size: 16px;
-  margin-bottom: 15px;
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  opacity: 0.8;
+  overflow: hidden;
 }
 
 #feedList,
 #tipsContainer {
   flex: 1;
   overflow-y: auto;
-  padding-right: 10px;
-}
-.feed-item {
-  display: flex;
-  align-items: center;
-  gap: 15px;
-  padding: 12px;
-  background: rgba(255, 255, 255, 0.03);
-  border-radius: 18px;
-  margin-bottom: 10px;
-}
-.tip-item {
-  background: rgba(0, 212, 255, 0.06);
-  padding: 16px;
-  border-radius: 18px;
-  font-size: 14px;
-  border-left: 4px solid var(--accent-info);
-  margin-bottom: 10px;
+  padding: 12px 18px 12px 8px;
+  scroll-behavior: smooth;
+  scrollbar-width: thin;
+  scrollbar-color: rgba(255, 255, 255, 0.1) transparent;
 }
 
-/* Кастомный скроллбар */
-#feedList::-webkit-scrollbar {
+#feedList::-webkit-scrollbar,
+#tipsContainer::-webkit-scrollbar {
   width: 4px;
 }
-#feedList::-webkit-scrollbar-thumb {
+
+#feedList::-webkit-scrollbar-thumb,
+#tipsContainer::-webkit-scrollbar-thumb {
   background: rgba(255, 255, 255, 0.1);
   border-radius: 10px;
 }
 
 /* ==========================================================================
-   7. МОДАЛКИ
+   13. КАРТОЧКИ ЛЕНТЫ И СОВЕТОВ
    ========================================================================== */
-.modal {
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  background: rgba(0, 0, 0, 0.7);
-  backdrop-filter: blur(10px);
-  display: none;
+.feed-item-card,
+.tip-item {
+  padding: 16px;
+  margin-bottom: 12px;
+  border-radius: var(--radius-md);
+  background: rgba(141, 141, 141, 0.116);
+  border: 1px solid var(--glass-border);
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  display: flex;
+  flex-direction: column;
+  animation: cardFadeIn 0.35s ease;
+  will-change: transform;
+}
+
+.feed-item-card:hover,
+.tip-item:hover {
+  transform: translateX(-3px);
+  background: rgba(255, 255, 255, 0.08);
+  border-color: rgba(255, 255, 255, 0.25);
+}
+
+.feed-icon {
+  width: 32px;
+  height: 32px;
+  display: flex;
   align-items: center;
   justify-content: center;
-  z-index: 9999;
+  border-radius: 10px;
+  transition: transform 0.3s ease;
 }
+
+.feed-item-card:hover .feed-icon {
+  transform: scale(1.1) rotate(-5deg);
+}
+
+.feed-icon-add {
+  color: var(--accent-success);
+  background: rgba(0, 255, 157, 0.1);
+}
+
+.feed-icon-pay {
+  color: var(--accent-info);
+  background: rgba(0, 212, 255, 0.1);
+}
+
+/* ==========================================================================
+   14. CHART
+   ========================================================================== */
+.section-header,
+.chart-header {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 20px;
+}
+
+.chart-wrapper {
+  width: 100%;
+  max-width: 420px;
+  aspect-ratio: 2 / 1;
+  height: 210px;
+}
+
+.chart-wrapper canvas {
+  width: 100%;
+  height: 100%;
+}
+
+#chartCenterInfo {
+  position: absolute;
+  bottom: 22%;
+  left: 50%;
+  transform: translateX(-50%);
+  text-align: center;
+  pointer-events: none;
+}
+
+/* ==========================================================================
+   15. LEGEND
+   ========================================================================== */
+.legend-row {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 24px;
+  margin-top: auto;
+  padding-top: 20px;
+  border-top: 1px solid var(--glass-border);
+}
+
+.legend-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  text-align: center;
+  transition: transform 0.2s ease;
+}
+
+.legend-item:hover {
+  transform: translateY(-2px);
+}
+
+.legend-dot {
+  width: 22px;
+  height: 4px;
+  border-radius: 2px;
+  background: var(--legend-color);
+}
+
+.legend-name {
+  font-size: 10px;
+  font-weight: 600;
+  color: rgba(255, 255, 255, 0.45);
+  text-transform: uppercase;
+  letter-spacing: 0.8px;
+  max-width: 80px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.legend-percent {
+  font-size: 15px;
+  font-weight: 800;
+  color: #ffffff;
+}
+
+/* ==========================================================================
+   16. MODALS
+   ========================================================================== */
+.animated-background {
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+}
+
+.container {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+  padding: var(--main-padding) 30px;
+  gap: 20px;
+  position: relative;
+  z-index: 2;
+}
+
 .modal.active {
   display: flex;
 }
+
 .modal-content {
   width: 420px;
-  padding: 35px;
-  border-radius: 32px;
-}
-input,
-textarea {
-  background: rgba(255, 255, 255, 0.05);
+  max-width: 90%;
+  padding: 28px;
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+
+  background: var(--glass-bg);
   border: 1px solid var(--glass-border);
-  padding: 14px;
-  border-radius: 14px;
-  color: #fff;
-  width: 100%;
-  margin-bottom: 10px;
-  outline: none;
+  border-radius: var(--radius-lg);
+
+  backdrop-filter: blur(8px);
 }
-.btn {
-  flex: 1;
-  padding: 14px;
-  border-radius: 14px;
-  border: none;
-  font-weight: 700;
+
+.modal-content input,
+.modal-content textarea {
+  width: 100%;
+  padding: 10px 12px;
+
+  border-radius: var(--radius-sm);
+
+  border: 1px solid rgba(255, 255, 255, 0.12);
+
+  background: rgba(0, 0, 0, 0.55);
+
+  color: #ffffff;
+
+  backdrop-filter: blur(6px);
+}
+
+/* иконка календаря светлая */
+
+/* поле даты */
+
+.modal-content input[type="date"] {
+  cursor: pointer;
+  user-select: none;
+}
+
+/* иконка календаря светлая */
+
+.modal-content input[type="date"]::-webkit-calendar-picker-indicator {
+  filter: invert(1) brightness(1.1);
+  opacity: 0.9;
+}
+
+/* убрать синее выделение текста */
+
+.modal-content input[type="date"]::selection {
+  background: transparent;
+}
+
+/* курсор на сегментах даты */
+
+.modal-content input[type="date"]::-webkit-datetime-edit {
   cursor: pointer;
 }
+
+#debtCommentInput {
+  resize: none;
+  overflow-y: auto;
+  max-height: 120px;
+  min-height: 70px;
+}
+
+#debtCommentInput::-webkit-scrollbar {
+  width: 6px;
+}
+
+#debtCommentInput::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+#debtCommentInput::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.2);
+  border-radius: 10px;
+}
+
+#debtCommentInput::-webkit-scrollbar-thumb:hover {
+  background: rgba(255, 255, 255, 0.35);
+}
+
+.modal-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
+  margin-top: 10px;
+}
+
+.modal-close {
+  position: absolute;
+  top: 16px;
+  right: 16px;
+  width: 32px;
+  height: 32px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: 18px;
+  background: rgba(255, 255, 255, 0.08);
+  color: rgba(255, 255, 255, 0.8);
+  transition: all 0.2s ease;
+}
+
+.modal-close:hover {
+  background: rgba(255, 255, 255, 0.15);
+  color: white;
+}
+
+/* Кнопки в модалках + сохранение */
+.btn {
+  padding: 8px 14px;
+  border-radius: var(--radius-sm);
+  border: none;
+  cursor: pointer;
+}
+
 .btn-success {
   background: var(--accent-success);
   color: #000;
+  font-weight: 600;
+}
+
+.btn-outline {
+  background: transparent;
+  border: 1px solid var(--glass-border);
+  color: #fff;
+}
+
+.btn-save {
+  width: 100%;
+
+  padding: 14px;
+
+  border-radius: 12px;
+
+  border: 1px solid rgba(16, 185, 129, 0.4);
+
+  background: rgba(255, 255, 255, 0.05);
+
+  color: #10b981;
+
+  font-weight: 700;
+
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+
+  cursor: pointer;
+
+  transition: all 0.25s ease;
+}
+
+.btn-save:hover {
+  background: rgba(16, 185, 129, 0.1);
+  border-color: rgba(16, 185, 129, 0.7);
+}
+
+.btn-save:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
+.btn-save:hover {
+  background: rgba(16, 185, 129, 0.2);
+  border-color: #10b981;
+  transform: translateY(-1px);
+}
+
+.btn-save:active {
+  transform: translateY(0);
+  background: rgba(16, 185, 129, 0.25);
+}
+
+.btn-save:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
+.category-buttons {
+  display: flex;
+  gap: 10px;
+  margin: 8px 0 20px;
+}
+
+.category-btn {
+  flex: 1;
+  padding: 10px 14px;
+  border-radius: 14px;
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  background: rgba(255, 255, 255, 0.04);
+  color: #fff;
+  font-size: 14px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.category-btn:hover {
+  background: rgba(255, 255, 255, 0.08);
+}
+
+.category-btn.active {
+  background: linear-gradient(
+    135deg,
+    rgba(0, 255, 160, 0.25),
+    rgba(0, 255, 160, 0.05)
+  );
+  border: 1px solid rgba(0, 255, 160, 0.4);
+  box-shadow: 0 0 10px rgba(0, 255, 160, 0.25);
+}
+
+.input-group {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+/* ==========================================================================
+   17. УТИЛИТЫ
+   ========================================================================== */
+.flex-col {
+  display: flex;
+  flex-direction: column;
+}
+
+.flex-center {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* ==========================================================================
+   18. АНИМАЦИИ
+   ========================================================================== */
+@keyframes cardFadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
