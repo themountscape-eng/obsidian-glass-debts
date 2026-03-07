@@ -5,11 +5,11 @@
 let scene, camera, renderer, mesh, uniforms, clock;
 
 const BACKGROUND_CONFIG = {
-  colorLight: "#0f766e", // более светлый зелёный
-  colorDark: "#021c17", // глубокий тёмный зелёный
-  speed: 0.16,
-  scale: 1.3,
-  noiseIntensity: 0.25,
+  colorLight: "#0c4f48", // чуть светлее
+  colorDark: "#011211", // почти тот же тёмный
+  speed: 0.2, // чуть медленнее
+  scale: 1.6,
+  noiseIntensity: 0.18, // меньше шума
   rotation: 0.0,
 };
 
@@ -93,11 +93,13 @@ function initBackground() {
   renderer = new THREE.WebGLRenderer({
     canvas: canvas,
     antialias: true,
-    alpha: true,
+    alpha: false,
   });
 
-  renderer.setSize(window.innerWidth, window.innerHeight);
   renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+  renderer.setSize(window.innerWidth, window.innerHeight);
+  renderer.setViewport(0, 0, window.innerWidth, window.innerHeight);
+  renderer.setClearColor(0x000000, 0);
 
   uniforms = {
     uTime: { value: 0 },
