@@ -1,9 +1,12 @@
 <!doctype html>
+
 <html lang="ru">
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Учет Долгов | Obsidian Glass</title>
+
+    ```
+    <title>Учёт Долгов | Obsidian Glass</title>
 
     <link
       href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800;900&display=swap"
@@ -16,7 +19,7 @@
     <link rel="stylesheet" href="css/modals.css" />
     <link rel="stylesheet" href="css/responsive.css" />
 
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    
   </head>
 
   <body>
@@ -24,28 +27,162 @@
       <canvas id="background-canvas"></canvas>
     </div>
 
+    ```
     <div class="container">
       <header id="app-header"></header>
 
       <div class="main-wrapper">
         <div id="left-section"></div>
         <div id="middle-section"></div>
-        <div id="stats-row"></div>
+        <div id="stats-row" class="stats-grid"></div>
         <div id="right-section"></div>
       </div>
     </div>
 
-    <div id="modal-root"></div>
+    <!-- MODALS -->
 
+    <div id="modal-root">
+      <!-- ADD DEBT MODAL -->
+      <div id="addModal" class="modal">
+        <div class="modal-content glass">
+          <button class="modal-close">✕</button>
+
+          <h2>Новый долг</h2>
+
+          <div class="input-group">
+            <input
+              id="debtorNameInput"
+              list="debtorSuggestions"
+              placeholder="Имя должника *"
+              autocomplete="off"
+              required
+            />
+
+            <datalist id="debtorSuggestions"></datalist>
+
+            <input
+              id="amountInput"
+              type="text"
+              placeholder="Сумма (₽) *"
+              inputmode="numeric"
+              required
+            />
+
+            <div class="category-buttons">
+              <button
+                type="button"
+                class="category-btn active"
+                data-type="transfer"
+              >
+                💳 Перевод
+              </button>
+
+              <button type="button" class="category-btn" data-type="cash">
+                💵 Наличные
+              </button>
+            </div>
+
+            <input
+              type="tel"
+              id="debtorPhoneInput"
+              placeholder="+7 999 999 99 99 (необязательно)"
+              inputmode="tel"
+              maxlength="18"
+            />
+
+            <textarea
+              id="debtCommentInput"
+              placeholder="Комментарий"
+            ></textarea>
+
+            <input type="date" id="debtDateInput" />
+          </div>
+
+          <div class="modal-actions">
+            <button
+              type="button"
+              id="saveDebtBtn"
+              class="btn-save"
+              onclick="handleAddDebtClick()"
+            >
+              Сохранить долг
+            </button>
+          </div>
+        </div>
+      </div>
+
+    <!-- WRITE OFF MODAL -->
+    <div id="writeOffModal" class="modal">
+      <div class="modal-content glass">
+        <button class="modal-close" onclick="closeAllModals()">✕</button>
+
+        <h2>Списать долг</h2>
+
+        <div class="input-group">
+          <input
+            id="writeOffNameInput"
+            list="debtorSuggestionsWrite"
+            placeholder="Имя должника"
+            autocomplete="off"
+          />
+
+          <datalist id="debtorSuggestionsWrite"></datalist>
+
+          <input
+            type="text"
+            id="writeOffAmountInput"
+            placeholder="Сумма списания (₽)"
+            inputmode="numeric"
+          />
+
+          <!-- WRITE OFF ALL -->
+          <div class="writeoff-box" id="writeOffBox">
+            <label class="writeoff-toggle" for="writeOffModeAll">
+              <span class="writeoff-text">
+                Списать все долги должника
+              </span>
+
+              <input type="checkbox" id="writeOffModeAll" />
+            </label>
+          </div>
+
+          <div id="debtsList" class="debts-list"></div>
+        </div>
+
+        <div class="modal-actions">
+          <button
+            id="confirmWriteOffBtn"
+            class="btn-save"
+            onclick="processWriteOff()"
+            disabled
+          >
+            Списать долг
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- LIBRARIES -->
+
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
-    <script src="js/storage.js"></script>
-    <script src="js/utils.js"></script>
-    <script src="js/icons.js"></script>
-    <script src="js/ui.js"></script>
-    <script src="js/debts.js"></script>
-    <script src="js/feed.js"></script>
-    <script src="js/chart.js"></script>
-    <script src="js/app.js"></script>
-    <script src="js/silk-background.js"></script>
+
+    <!-- CORE -->
+
+    <script src="js/database.js" defer></script>
+
+    <!-- UI -->
+
+    <script src="js/icons.js" defer></script>
+    <script src="js/ui.js" defer></script>
+
+    <!-- APP LOGIC -->
+
+    <script src="js/app.js" defer></script>
+
+    <!-- VISUAL MODULES -->
+
+    
+    <script src="js/silk-background.js" defer></script>
   </body>
 </html>
