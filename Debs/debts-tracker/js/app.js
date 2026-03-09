@@ -8,22 +8,48 @@ function initApp() {
   console.log("App initializing...");
   updateAllUI();
 
-  const dateInput = document.getElementById("debtDateInput");
-
-  if (dateInput && dateInput.showPicker) {
-    dateInput.addEventListener("mousedown", (e) => {
-      e.preventDefault();
-      dateInput.showPicker();
-    });
-  }
+  document.querySelectorAll('input[type="date"]').forEach((dateInput) => {
+    if (dateInput.showPicker) {
+      dateInput.addEventListener("mousedown", (e) => {
+        e.preventDefault();
+        dateInput.showPicker();
+      });
+    }
+  });
 }
 
 function updateAllUI() {
   if (typeof renderLayout === "function") renderLayout();
+
   const stats = refreshAppState();
-  if (typeof updateStatsUI === "function" && stats) updateStatsUI(stats);
-  if (typeof renderFeed === "function") renderFeed();
-  if (typeof initCharts === "function") requestAnimationFrame(initCharts);
+
+  if (typeof updateStatsUI === "function" && stats) {
+    updateStatsUI(stats);
+  }
+}
+
+function closeAllModals() {
+  document.querySelectorAll(".modal").forEach((modal) => {
+    modal.classList.remove("active");
+
+    // очищаем текстовые поля
+    modal
+      .querySelectorAll("input:not([type='date']), textarea")
+      .forEach((field) => {
+        field.value = "";
+      });
+
+    // обрабатываем даты отдельно
+    modal.querySelectorAll('input[type="date"]').forEach((dateField) => {
+      if (dateField.id === "debtDateInput") {
+        dateField.value = new Date().toISOString().split("T")[0];
+      }
+
+      if (dateField.id === "returnDateInput") {
+        dateField.value = "";
+      }
+    });
+  });
 }
 
 function refreshAppState() {
@@ -46,12 +72,14 @@ function refreshAppState() {
 
 window.handleAddDebtClick = function () {
   const btn = document.getElementById("saveDebtBtn");
+  if (btn?.disabled) return;
 
   const nameInput = document.getElementById("debtorNameInput");
   const amountInput = document.getElementById("amountInput");
   const phoneInput = document.getElementById("debtorPhoneInput");
   const commentInput = document.getElementById("debtCommentInput");
   const dateInput = document.getElementById("debtDateInput");
+  const returnDateInput = document.getElementById("returnDateInput");
   const categoryBtn = document.querySelector(".category-btn.active");
 
   if (!nameInput?.value.trim() || !amountInput?.value) {
@@ -71,6 +99,11 @@ window.handleAddDebtClick = function () {
   const name = nameInput.value.trim();
   const category = categoryBtn?.dataset?.type || "transfer";
   const dateValue = dateInput?.value || new Date().toISOString().slice(0, 10);
+  const returnDate = returnDateInput?.value || "";
+  if (returnDate && returnDate < dateValue) {
+    alert("Дата возврата не может быть раньше даты долга");
+    return;
+  }
 
   /* ===== состояние загрузки ===== */
 
@@ -88,6 +121,7 @@ window.handleAddDebtClick = function () {
         phoneInput?.value || "",
         commentInput?.value || "",
         dateValue,
+        returnDate,
       );
     }
 
@@ -338,6 +372,7 @@ function escapeHtml(text) {
     '"': "&quot;",
     "'": "&#039;",
   };
+  if (!text) return "";
   return text.replace(/[&<>"']/g, (m) => map[m]);
 }
 
