@@ -79,47 +79,6 @@
   margin-bottom: 8px;
 }
 
-/* Кнопки выбора категории */
-
-.modal-category-btns {
-  display: flex;
-  gap: 10px;
-}
-
-.category-btn {
-  flex: 1;
-  cursor: pointer;
-  display: block;
-}
-
-.category-btn input {
-  display: none;
-}
-
-.category-btn span {
-  display: block;
-
-  text-align: center;
-  padding: 12px;
-
-  border-radius: 10px;
-
-  border: 1px solid rgba(255, 255, 255, 0.25);
-  background: rgba(255, 255, 255, 0.05);
-
-  transition: all 0.2s ease;
-}
-
-.category-btn input:checked + span {
-  border-color: #059669;
-  background: rgba(5, 150, 105, 0.2);
-  color: #10b981;
-}
-
-.category-btn:hover span {
-  background: rgba(255, 255, 255, 0.1);
-}
-
 /* Кнопки действий */
 
 .modal-content .modal-actions {
@@ -130,4 +89,149 @@
 
 #writeOffModal .modal-content {
   min-height: 520px;
+}
+
+.optional {
+  font-size: 11px;
+  opacity: 0.6;
+  margin-left: 4px;
+}
+
+.modal-hint {
+  font-size: 11px;
+  opacity: 0.5;
+  margin-top: -6px;
+  margin-bottom: 10px;
+}
+
+.stats-modal {
+  max-width: 520px;
+}
+
+.stats-list {
+  max-height: 420px;
+  overflow-y: auto;
+
+  padding-right: 6px;
+
+  margin-top: 20px;
+
+  display: flex;
+
+  flex-direction: column;
+
+  gap: 10px;
+}
+
+.stats-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+
+  padding: 16px 20px;
+
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+
+  cursor: pointer;
+
+  transition: 0.2s;
+}
+
+.stats-item:hover {
+  background: rgba(255, 255, 255, 0.05);
+}
+
+.stats-left {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.stats-name {
+  font-weight: 600;
+}
+
+.stats-meta {
+  font-size: 12px;
+  opacity: 0.6;
+}
+
+.stats-amount {
+  opacity: 0.8;
+}
+
+.stats-empty {
+  text-align: center;
+
+  opacity: 0.6;
+
+  padding: 30px;
+}
+
+.stats-list::-webkit-scrollbar {
+  width: 8px;
+}
+
+.stats-list::-webkit-scrollbar-track {
+  background: rgba(255, 255, 255, 0.04);
+  border-radius: 10px;
+}
+
+.stats-list::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.18);
+  border-radius: 10px;
+}
+
+.stats-list::-webkit-scrollbar-thumb:hover {
+  background: rgba(255, 255, 255, 0.35);
+}
+
+.debt-card {
+  max-width: 420px;
+}
+
+.debt-card-name {
+  font-size: 22px;
+  font-weight: 700;
+
+  margin-bottom: 10px;
+}
+
+.debt-card-amount {
+  font-size: 34px;
+  font-weight: 800;
+
+  margin-bottom: 20px;
+}
+
+.debt-card-meta {
+  opacity: 0.7;
+  font-size: 14px;
+
+  margin-bottom: 20px;
+}
+
+.debt-card-actions {
+  display: flex;
+  gap: 10px;
+}
+
+.debt-card-actions button {
+  flex: 1;
+
+  padding: 12px;
+  border-radius: 10px;
+  border: none;
+
+  cursor: pointer;
+}
+
+.btn-pay {
+  background: #10b981;
+  color: black;
+}
+
+.btn-writeoff {
+  background: #ef4444;
+  color: white;
 }
